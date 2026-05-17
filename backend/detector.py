@@ -39,6 +39,8 @@ def detect_python_errors(code: str):
 # C++ Detection
 def detect_cpp_errors(code: str):
 
+    import re
+
     errors = []
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".cpp") as temp:
@@ -55,16 +57,13 @@ def detect_cpp_errors(code: str):
 
     if result.stderr:
 
-        cleaned_error = result.stderr.splitlines()
+        matches = re.findall(r'error: (.*)', result.stderr)
 
-        important_lines = []
+        if matches:
+            formatted_message = "\n".join(matches)
 
-        for line in cleaned_error:
-
-            if "error:" in line:
-                important_lines.append(line.strip())
-
-        formatted_message = "\n".join(important_lines)
+        else:
+            formatted_message = result.stderr
 
         errors.append({
             "type": "C++ Compilation Error",
