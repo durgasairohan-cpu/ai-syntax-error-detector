@@ -54,16 +54,27 @@ def detect_cpp_errors(code: str):
     )
 
     if result.stderr:
+
+        cleaned_error = result.stderr.splitlines()
+
+        important_lines = []
+
+        for line in cleaned_error:
+
+            if "error:" in line:
+                important_lines.append(line.strip())
+
+        formatted_message = "\n".join(important_lines)
+
         errors.append({
             "type": "C++ Compilation Error",
-            "message": result.stderr,
+            "message": formatted_message,
             "line": None
         })
 
     os.remove(temp_file)
 
     return errors
-
 
 # Java Detection
 def detect_java_errors(code: str):
