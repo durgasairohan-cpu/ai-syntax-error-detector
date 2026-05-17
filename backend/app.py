@@ -1,6 +1,12 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from detector import detect_python_errors
+
+from detector import (
+    detect_python_errors,
+    detect_cpp_errors,
+    detect_java_errors
+)
+
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -21,15 +27,31 @@ class CodeRequest(BaseModel):
 
 @app.get("/")
 def home():
-    return {"message": "AI Syntax Error Detector API Running"}
+
+    return {
+        "message": "AI Syntax Error Detector API Running"
+    }
 
 
 @app.post("/analyze")
 def analyze_code(request: CodeRequest):
 
-    if request.language.lower() == "python":
+    language = request.language.lower()
+
+    if language == "python":
+
         result = detect_python_errors(request.code)
+
+    elif language == "cpp":
+
+        result = detect_cpp_errors(request.code)
+
+    elif language == "java":
+
+        result = detect_java_errors(request.code)
+
     else:
+
         result = [{
             "type": "Info",
             "message": f"{request.language} support coming soon.",
